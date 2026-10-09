@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Notícias - CEEP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="page-wrapper">
+    
+    <!-- CABEÇALHO DA PÁGINA DE NOTÍCIAS -->
+    <header class="top-header">
+      <div class="header-left">
+        <a href="/" class="btn-back">
+          <i class="fa-solid fa-arrow-left"></i> Voltar ao Mapa
+        </a>
+        <h1 class="logo-title">
+          <i class="fa-solid fa-newspaper"></i>
+          <span>Central de <strong>Notícias</strong></span>
+        </h1>
+      </div>
+
+      {% if is_admin %}
+        <div class="admin-badge">
+          <i class="fa-solid fa-shield-halved"></i> Modo Administrador
+        </div>
+      {% endif %}
+    </header>
+
+    <main class="news-layout">
+
+      <!-- 1. PUBLICAÇÕES RECENTES (AGORA NO TOPO) -->
+      <div class="feed-list">
+        <h2 class="feed-title-section">
+          <i class="fa-solid fa-bullhorn"></i> Publicações Recentes (Últimos 14 dias)
+        </h2>
+
+        {% if noticias %}
+          {% for noticia in noticias %}
+            <div class="feed-post-card" id="noticia-{{ noticia.id }}">
+              <div class="post-header">
+                <div class="post-author-info">
+                  <i class="fa-solid fa-circle-user author-avatar"></i>
+                  <div>
+                    <strong>{{ noticia.autor }}</strong>
+                    <small><i class="fa-regular fa-clock"></i> {{ noticia.data_criacao.strftime('%d/%m/%Y às %H:%M') }}</small>
+                  </div>
+                </div>
+                {% if is_admin %}
+                  <button class="btn-delete-post" onclick="deletarNoticia({{ noticia.id }})">
+                    <i class="fa-solid fa-trash"></i> Excluir
+                  </button>
+                {% endif %}
+              </div>
+
+              <div class="post-content">
+                <p>{{ noticia.conteudo }}</p>
+              </div>
+
+              {% if noticia.imagem or noticia.video or noticia.documento %}
+                <div class="post-attachments">
+                  {% if noticia.imagem %}
+                    <div class="attachment-media">
+                      <img src="{{ url_for('static', filename='uploads/noticias/' + noticia.imagem) }}" alt="Imagem da publicação">
+                    </div>
+                  {% endif %}
+
+                  {% if noticia.video %}
+                    <div class="attachment-media">
+                      <video controls>
+                        <source src="{{ url_for('static', filename='uploads/noticias/' + noticia.video) }}">
+                        Seu navegador não suporta a exibição deste vídeo.
+                      </video>
+                    </div>
+                  {% endif %}
+
+                  {% if noticia.documento %}
+                    <div class="attachment-doc">
+                      <a href="{{ url_for('static', filename='uploads/noticias/' + noticia.documento) }}" target="_blank">
+                        <i class="fa-solid fa-file-pdf"></i> Anexo: {{ noticia.documento_nome_original or noticia.documento }}
+                      </a>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-feed">
+            <i class="fa-solid fa-newspaper" style="font-size: 36px; margin-bottom: 10px; color: #64748b;"></i>
+            <p>Nenhuma publicação recente nos últimos 14 dias.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- 2. FORMULÁRIO DE CRIAR NOVA PUBLICAÇÃO (AGORA ABAIXO) -->
+      <div class="post-form-card">
+        <h3><i class="fa-solid fa-pen-to-square"></i> Criar Nova Publicação</h3>
+        
+        <form id="formCriarNoticia" enctype="multipart/form-data">
+          <div class="textarea-wrapper">
+            <textarea id="conteudoNoticia" name="conteudo" maxlength="870" placeholder="Escreva aqui a sua notícia ou aviso para a comunidade escolar (máximo 870 caracteres)..." required></textarea>
+            <span class="char-counter" id="charCounter">0 / 870</span>
+          </div>
+
+          <div class="media-attachments-grid">
+            <label class="file-btn">
+              <i class="fa-solid fa-image"></i>
+              <span>Imagem</span>
+              <input type="file" id="imagemInput" name="imagem" accept="image/*">
+              <span class="file-name-preview" id="imagemName"></span>
+            </label>
+
+            <label class="file-btn">
+              <i class="fa-solid fa-video"></i>
+              <span>Vídeo</span>
+              <input type="file" id="videoInput" name="video" accept="video/*">
+              <span class="file-name-preview" id="videoName"></span>
+            </label>
+
+            <label class="file-btn">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Documento</span>
+              <input type="file" id="documentoInput" name="documento" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx">
+              <span class="file-name-preview" id="documentoName"></span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-publish">
+            <i class="fa-solid fa-paper-plane"></i> Publicar Notícia
+          </button>
+        </form>
+      </div>
+
+    </main>
+
+  </div>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 CEEP - Mapa Interativo do Campus. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- JAVASCRIPT DA PÁGINA DE NOTÍCIAS -->
+  <script>
+    // Contador de Caracteres
+    const conteudoInput = document.getElementById('conteudoNoticia');
+    const charCounter = document.getElementById('charCounter');
+
+    if (conteudoInput) {
+      conteudoInput.addEventListener('input', () => {
+        const len = conteudoInput.value.length;
+        charCounter.textContent = `${len} / 870`;
+      });
+    }
+
+    // Exibir nome dos arquivos selecionados
+    function setupFilePreview(inputId, textId) {
+      const input = document.getElementById(inputId);
+      const text = document.getElementById(textId);
+      if (input && text) {
+        input.addEventListener('change', () => {
+          text.textContent = input.files.length > 0 ? input.files[0].name : '';
+        });
+      }
+    }
+
+    setupFilePreview('imagemInput', 'imagemName');
+    setupFilePreview('videoInput', 'videoName');
+    setupFilePreview('documentoInput', 'documentoName');
+
+    // Envio do Formulário via AJAX
+    const formCriarNoticia = document.getElementById('formCriarNoticia');
+    if (formCriarNoticia) {
+      formCriarNoticia.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(formCriarNoticia);
+
+        fetch('/api/noticias/criar', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso) {
+            window.location.reload();
+          } else {
+            alert(data.mensagem);
+          }
+        })
+        .catch(err => alert('Erro ao publicar notícia. Tente novamente.'));
+      });
+    }
+
+    // Função para Excluir Notícia
+    function deletarNoticia(id) {
+      if (!confirm('Tem certeza que deseja excluir esta publicação?')) return;
+
+      fetch(`/api/noticias/deletar/${id}`, {
+        method: 'POST'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.sucesso) {
+          const card = document.getElementById(`noticia-${id}`);
+          if (card) card.remove();
+        } else {
+          alert(data.mensagem);
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

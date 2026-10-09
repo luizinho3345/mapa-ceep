@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEEP Mapa</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- CHECKBOXES INVISÍVEIS DAS MODAIS PURE CSS -->
+  <input type="checkbox" id="modal-biblio-toggle" hidden>
+  <input type="checkbox" id="modal-quadra-toggle" hidden>
+  <input type="checkbox" id="modal-quimica-toggle" hidden>
+  <input type="checkbox" id="modal-eletronica-toggle" hidden>
+  <input type="checkbox" id="modal-pedagogia-toggle" hidden>
+  <input type="checkbox" id="modal-horta-toggle" hidden>
+  <input type="checkbox" id="modal-reprografia-toggle" hidden>
+  <input type="checkbox" id="modal-auditorio-toggle" hidden>
+  <input type="checkbox" id="modal-quadra_externa-toggle" hidden>
+  <input type="checkbox" id="modal-campo_sintetico-toggle" hidden>
+  <input type="checkbox" id="modal-entrada_ceep-toggle" hidden>
+  <input type="checkbox" id="modal-cantina-toggle" hidden>
+  <input type="checkbox" id="modal-casa_madruga-toggle" hidden>
+  <input type="checkbox" id="modal-cantinho_sossego-toggle" hidden>
+
+  <!-- MÁSCARA ESCURA DA BARRA LATERAL -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- BARRA LATERAL (MENU USUÁRIO) -->
+  <aside class="sidebar collapsed" id="sidebar">
+    <div class="sidebar-header">
+      <div class="user-info">
+        <i class="fa-solid fa-circle-user avatar-icon"></i>
+        <div>
+          <span class="user-name" id="userDisplayName">{{ username }}</span>
+          <small id="userDisplayCGM" style="display:block; color:#64748b; font-size:11px;">CGM: {{ cgm }}</small>
+        </div>
+      </div>
+      <button class="close-sidebar-btn" id="closeSidebar" title="Fechar Menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul>
+        <li>
+          <a href="/noticias" class="news-link-highlight">
+            <i class="fa-solid fa-newspaper"></i> 
+            <span>Central de Notícias</span>
+          </a>
+        </li>
+        <li><a href="#" id="btnAbrirMensagens"><i class="fa-solid fa-envelope"></i> Caixa de Mensagens</a></li>
+        <li><a href="#"><i class="fa-solid fa-language"></i> Idioma: PT-BR</a></li>
+        <li><a href="/sobre"><i class="fa-solid fa-circle-info"></i> Sobre o Projeto</a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Sair / Log out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MODAL DE MENSAGENS -->
+  <div class="modal-overlay" id="mensagensModal">
+    <div class="modal-card">
+      <button class="close-modal-btn" id="closeMensagensModal" title="Fechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="modal-body">
+        <h2 class="modal-title"><i class="fa-solid fa-envelope-open-text"></i> Caixa de Mensagens</h2>
+        <p class="modal-description">Avisos e documentos enviados pela Secretaria para o seu CGM.</p>
+        <div id="listaMensagensContainer" class="messages-list">
+          <p style="color: #94a3b8; font-size: 13px;">Carregando mensagens...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DA SECRETARIA -->
+  <div class="modal-overlay" id="secretariaModal">
+    <div class="modal-card">
+      <button class="close-modal-btn" id="closeSecretariaModal" title="Fechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <div class="carousel-container">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide active">
+            <div class="photo-placeholder">
+              <i class="fa-solid fa-camera"></i>
+              <span>Foto 1 da Secretaria</span>
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="photo-placeholder">
+              <i class="fa-solid fa-camera"></i>
+              <span>Foto 2 da Secretaria</span>
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="photo-placeholder">
+              <i class="fa-solid fa-camera"></i>
+              <span>Foto 3 da Secretaria</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="carousel-btn prev" id="prevSlide" title="Foto Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="carousel-btn next" id="nextSlide" title="Próxima Foto"><i class="fa-solid fa-chevron-right"></i></button>
+
+        <div class="carousel-dots" id="carouselDots">
+          <span class="dot active" data-index="0"></span>
+          <span class="dot" data-index="1"></span>
+          <span class="dot" data-index="2"></span>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Secretaria do CEEP</h2>
+        <p class="modal-description">
+          A secretaria do CEEP é o local onde estudantes, funcionários e demais envolvidos na comunidade escolar podem solicitar serviços como: protocolo de atestados, rematrícula, processamento de documentos, etc.
+        </p>
+
+        <div class="services-accordion">
+          <div class="accordion-item">
+            <button class="accordion-header" data-target="panelAtestado">
+              <span><i class="fa-solid fa-file-arrow-up"></i> Protocolar Atestado</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelAtestado">
+              <div class="panel-content">
+                <p class="panel-instruction">Anexe o arquivo em formato PDF do seu atestado médico:</p>
+                <div class="file-upload-box">
+                  <input type="file" id="atestadoFile" accept=".pdf" class="file-input">
+                  <label for="atestadoFile" class="file-label">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span id="fileNameText">Clique para selecionar o arquivo PDF</span>
+                  </label>
+                </div>
+                <div class="panel-action">
+                  <button class="btn-confirm" id="btnEnviarAtestado">Confirmar Envio</button>
+                </div>
+                <div class="status-msg success-msg hidden" id="msgAtestado">
+                  <i class="fa-solid fa-circle-check"></i> <span id="msgAtestadoTexto">Atestado enviado com sucesso!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" data-target="panelContrato">
+              <span><i class="fa-solid fa-file-contract"></i> Ver Situação de Contrato</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelContrato">
+              <div class="panel-content">
+                <div class="form-row">
+                  <input type="text" id="nomeContratoInput" value="{{ username }}" placeholder="Digite seu Nome..." class="modal-input">
+                  <button class="btn-primary" id="btnBuscarContrato">Consultar</button>
+                </div>
+                
+                <div class="contract-card hidden" id="contractResult">
+                  <div class="contract-badge"><i class="fa-solid fa-circle-check"></i> Contrato Ativo em Vigência</div>
+                  <div class="contract-details">
+                    <div class="detail-item"><span class="detail-label">Empresa:</span><span class="detail-value" id="resEmpresa">-</span></div>
+                    <div class="detail-item"><span class="detail-label">Função:</span><span class="detail-value" id="resFuncao">-</span></div>
+                    <div class="detail-item"><span class="detail-label">Carga Horária:</span><span class="detail-value" id="resCarga">-</span></div>
+                    <div class="detail-item"><span class="detail-label">Tempo Restante:</span><span class="detail-value highlight" id="resTempo">-</span></div>
+                  </div>
+                </div>
+                <div class="status-msg alert-box hidden" id="msgContratoErro"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" data-target="panelDeclaracao">
+              <span><i class="fa-solid fa-file-invoice"></i> Solicitar Declaração de Matrícula</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelDeclaracao">
+              <div class="panel-content">
+                <div class="form-grid">
+                  <input type="text" id="nomeDeclaracaoInput" value="{{ username }}" placeholder="Seu Nome Completo..." class="modal-input">
+                  <input type="text" id="cgmInput" value="{{ cgm }}" placeholder="Número do seu CGM..." class="modal-input">
+                </div>
+                <div class="panel-action">
+                  <button class="btn-confirm" id="btnSolicitarDeclaracao">Solicitar Declaração</button>
+                </div>
+                <div class="status-msg info-msg hidden" id="msgDeclaracao">
+                  <i class="fa-solid fa-circle-info"></i> Solicitação enviada!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÁGINA PRINCIPAL -->
+  <div class="page-wrapper">
+    
+    <header class="top-header">
+      <div class="header-left">
+        <button class="menu-toggle" id="menuToggle">
+          <i class="fa-solid fa-bars"></i>
+          <span>Menu</span>
+        </button>
+        <h1 class="logo-title">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>CEEP <strong>Mapa</strong></span>
+        </h1>
+      </div>
+
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Pesquisar bloco, secretaria, bebedouro...">
+      </div>
+    </header>
+
+    <main class="main-content-layout">
+      
+      <!-- PAINEL FIXO DE FILTROS À ESQUERDA -->
+      <aside class="filter-sidebar">
+        <div class="filter-sidebar-header">
+          <h3><i class="fa-solid fa-sliders"></i> Filtros do Mapa</h3>
+          <p>Marque para exibir os pontos.</p>
+        </div>
+
+        <div class="filter-actions-bar">
+          <button type="button" class="btn-filter-action" id="btnShowAll">
+            <i class="fa-solid fa-eye"></i> Mostrar Todos
+          </button>
+          <button type="button" class="btn-filter-action" id="btnHideAll">
+            <i class="fa-solid fa-eye-slash"></i> Ocultar Todos
+          </button>
+        </div>
+
+        <div class="filter-options-list">
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="entrada_ceep" checked>
+            <span class="custom-check check-entrada-ceep"><i class="fa-solid fa-door-open"></i></span>
+            <span class="filter-label">Entrada / Acesso CEEP</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="campo_sintetico" checked>
+            <span class="custom-check check-campo-sintetico"><i class="fa-solid fa-futbol"></i></span>
+            <span class="filter-label">Campo Futebol Sintético</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="casa_madruga" checked>
+            <span class="custom-check check-casa-madruga"><i class="fa-solid fa-house-user"></i></span>
+            <span class="filter-label">Casa do Madruga</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="cantinho_sossego" checked>
+            <span class="custom-check check-cantinho-sossego"><i class="fa-solid fa-leaf"></i></span>
+            <span class="filter-label">Quiosque</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="quadra_externa" checked>
+            <span class="custom-check check-quadra-externa"><i class="fa-solid fa-basketball"></i></span>
+            <span class="filter-label">Quadra Externa</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="auditorio" checked>
+            <span class="custom-check check-auditorio"><i class="fa-solid fa-masks-theater"></i></span>
+            <span class="filter-label">Auditório</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="secretaria" checked>
+            <span class="custom-check check-secretaria"><i class="fa-solid fa-building-columns"></i></span>
+            <span class="filter-label">Secretaria / Atendimento</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="biblioteca" checked>
+            <span class="custom-check check-bilioteca"><i class="fa-solid fa-book-open"></i></span>
+            <span class="filter-label">Biblioteca</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="quadra" checked>
+            <span class="custom-check check-quadra"><i class="fa-solid fa-volleyball"></i></span>
+            <span class="filter-label">Quadra Poliesportiva</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="reprografia" checked>
+            <span class="custom-check check-reprografia"><i class="fa-solid fa-print"></i></span>
+            <span class="filter-label">Reprografia</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="cantina" checked>
+            <span class="custom-check check-cantina"><i class="fa-solid fa-utensils"></i></span>
+            <span class="filter-label">Cantina</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="quimica" checked>
+            <span class="custom-check check-quimica"><i class="fa-solid fa-flask"></i></span>
+            <span class="filter-label">Lab. de Química</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="eletronica" checked>
+            <span class="custom-check check-eletronica"><i class="fa-solid fa-microchip"></i></span>
+            <span class="filter-label">Lab. de Eletrônica</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="pedagogia" checked>
+            <span class="custom-check check-pedagogia"><i class="fa-solid fa-graduation-cap"></i></span>
+            <span class="filter-label">Setor Pedagógico</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="horta" checked>
+            <span class="custom-check check-horta"><i class="fa-solid fa-seedling"></i></span>
+            <span class="filter-label">Horta Escolar</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="bebedouro" checked>
+            <span class="custom-check check-bebedouro"><i class="fa-solid fa-droplet"></i></span>
+            <span class="filter-label">Bebedouros</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="banheiro_masculino" checked>
+            <span class="custom-check check-banheiro-masculino"><i class="fa-solid fa-mars"></i></span>
+            <span class="filter-label">Banheiro Masculino</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="banheiro_feminino" checked>
+            <span class="custom-check check-banheiro-feminino"><i class="fa-solid fa-venus"></i></span>
+            <span class="filter-label">Banheiro Feminino</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="vestiario_masculino" checked>
+            <span class="custom-check check-vestiario-masculino"><i class="fa-solid fa-shirt"></i></span>
+            <span class="filter-label">Vestiário Masculino</span>
+          </label>
+
+          <label class="filter-item">
+            <input type="checkbox" class="category-checkbox" value="vestiario_feminino" checked>
+            <span class="custom-check check-vestiario-feminino"><i class="fa-solid fa-shirt"></i></span>
+            <span class="filter-label">Vestiário Feminino</span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- ÁREA DO MAPA -->
+      <section class="map-card">
+        <div class="card-header">
+          <h2>Navegação Geral do Campus</h2>
+        </div>
+
+        <div class="map-wrapper">
+          <div class="map-container" id="mapContainer">
+            <img src="{{ url_for('static', filename='mapa.jpg') }}" alt="Mapa do CEEP" id="mapaImg">
+
+            <!-- ENTRADA -->
+            <label for="modal-entrada_ceep-toggle" class="map-marker clickable-marker" data-category="entrada_ceep" style="top: 83%; left: 49%;">
+              <span class="marker-icon entrada-ceep-icon"><i class="fa-solid fa-door-open"></i></span>
+              <span class="marker-tooltip">Entrada / Acesso CEEP</span>
+            </label>
+
+            <!-- CAMPO SINTÉTICO -->
+            <label for="modal-campo_sintetico-toggle" class="map-marker clickable-marker" data-category="campo_sintetico" style="top: 15%; left: 83.66%;">
+              <span class="marker-icon campo-sintetico-icon"><i class="fa-solid fa-futbol"></i></span>
+              <span class="marker-tooltip">Campo Futebol Sintético</span>
+            </label>
+
+            <!-- QUADRA EXTERNA -->
+            <label for="modal-quadra_externa-toggle" class="map-marker clickable-marker" data-category="quadra_externa" style="top: 23.6%; left: 25.3%;">
+              <span class="marker-icon quadra-externa-icon"><i class="fa-solid fa-basketball"></i></span>
+              <span class="marker-tooltip">Quadra Externa</span>
+            </label>
+
+            <!-- CASA DO MADRUGA -->
+            <label for="modal-casa_madruga-toggle" class="map-marker clickable-marker" data-category="casa_madruga" style="top: 45%; left: 12%;">
+              <span class="marker-icon casa-madruga-icon"><i class="fa-solid fa-house-user"></i></span>
+              <span class="marker-tooltip">Casa do Madruga</span>
+            </label>
+
+            <!-- QUIOSQUE -->
+            <label for="modal-cantinho_sossego-toggle" class="map-marker clickable-marker" data-category="cantinho_sossego" style="top: 30%; left: 48%;">
+              <span class="marker-icon cantinho-sossego-icon"><i class="fa-solid fa-leaf"></i></span>
+              <span class="marker-tooltip">Quiosque (Cantinho do Sossego)</span>
+            </label>
+
+            <!-- AUDITÓRIO -->
+            <label for="modal-auditorio-toggle" class="map-marker clickable-marker" data-category="auditorio" style="top: 84%; left: 09%;">
+              <span class="marker-icon auditorio-icon"><i class="fa-solid fa-masks-theater"></i></span>
+              <span class="marker-tooltip">Auditório</span>
+            </label>
+
+            <!-- REPROGRAFIA -->
+            <label for="modal-reprografia-toggle" class="map-marker clickable-marker" data-category="reprografia" style="top: 63%; left: 51%;">
+              <span class="marker-icon reprografia-icon"><i class="fa-solid fa-print"></i></span>
+              <span class="marker-tooltip">Reprografia</span>
+            </label>
+
+            <!-- CANTINA -->
+            <label for="modal-cantina-toggle" class="map-marker clickable-marker" data-category="cantina" style="top: 69.5%; left: 46%;">
+              <span class="marker-icon cantina-icon"><i class="fa-solid fa-utensils"></i></span>
+              <span class="marker-tooltip">Cantina</span>
+            </label>
+
+            <!-- SECRETARIA -->
+            <div class="map-marker clickable-marker" data-category="secretaria" id="secretariaMarker" style="top: 65%; left: 53%;">
+              <span class="marker-icon secretaria-icon"><i class="fa-solid fa-building-columns"></i></span>
+              <div class="marker-tooltip">Secretaria do CEEP</div>
+            </div>
+
+            <!-- BIBLIOTECA -->
+            <label for="modal-biblio-toggle" class="map-marker clickable-marker" data-category="biblioteca" style="top: 67%; left: 51%;">
+              <span class="marker-icon biblioteca-icon"><i class="fa-solid fa-book-open"></i></span>
+              <span class="marker-tooltip">Biblioteca do CEEP</span>
+            </label>
+
+            <!-- QUADRA POLIESPORTIVA -->
+            <label for="modal-quadra-toggle" class="map-marker clickable-marker" data-category="quadra" style="top: 50%; left: 83%;">
+              <span class="marker-icon quadra-icon"><i class="fa-solid fa-volleyball"></i></span>
+              <span class="marker-tooltip">Quadra Poliesportiva</span>
+            </label>
+
+            <!-- LAB QUÍMICA -->
+            <label for="modal-quimica-toggle" class="map-marker clickable-marker" data-category="quimica" style="top: 64%; left: 70%;">
+              <span class="marker-icon quimica-icon"><i class="fa-solid fa-flask"></i></span>
+              <span class="marker-tooltip">Laboratório de Química</span>
+            </label>
+
+            <!-- LAB ELETRÔNICA -->
+            <label for="modal-eletronica-toggle" class="map-marker clickable-marker" data-category="eletronica" style="top: 67%; left: 70%;">
+              <span class="marker-icon eletronica-icon"><i class="fa-solid fa-microchip"></i></span>
+              <span class="marker-tooltip">Laboratório de Eletrônica</span>
+            </label>
+
+            <!-- PEDAGOGIA -->
+            <label for="modal-pedagogia-toggle" class="map-marker clickable-marker" data-category="pedagogia" style="top: 72%; left: 41%;">
+              <span class="marker-icon pedagogia-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+              <span class="marker-tooltip">Setor Pedagógico</span>
+            </label>
+
+            <!-- HORTA -->
+            <label for="modal-horta-toggle" class="map-marker clickable-marker" data-category="horta" style="top: 05%; left: 13%;">
+              <span class="marker-icon horta-icon"><i class="fa-solid fa-seedling"></i></span>
+              <span class="marker-tooltip">Horta Escolar</span>
+            </label>
+
+            <!-- BEBEDOUROS -->
+            <div class="map-marker" data-category="bebedouro" style="top: 51%; left: 51%;">
+              <span class="marker-icon water-drop"><i class="fa-solid fa-droplet"></i></span>
+              <div class="marker-tooltip">Bebedouro - Bloco Didático</div>
+            </div>
+            <div class="map-marker" data-category="bebedouro" style="top: 43%; left: 73%;">
+              <span class="marker-icon water-drop"><i class="fa-solid fa-droplet"></i></span>
+              <div class="marker-tooltip">Bebedouro - Quadra Coberta</div>
+            </div>
+            <div class="map-marker" data-category="bebedouro" style="top: 77%; left: 71%;">
+              <span class="marker-icon water-drop"><i class="fa-solid fa-droplet"></i></span>
+              <div class="marker-tooltip">Bebedouro - Área de Convivência</div>
+            </div>
+
+            <!-- BANHEIROS MASCULINOS -->
+            <div class="map-marker" data-category="banheiro_masculino" style="top: 50%; left: 53%;">
+              <span class="marker-icon banheiro-masculino-icon"><i class="fa-solid fa-mars"></i></span>
+              <div class="marker-tooltip">Banheiro Masculino - Bloco Didático 1</div>
+            </div>
+            <div class="map-marker" data-category="banheiro_masculino" style="top: 46%; left: 73%;">
+              <span class="marker-icon banheiro-masculino-icon"><i class="fa-solid fa-mars"></i></span>
+              <div class="marker-tooltip">Banheiro Masculino - Quadra Coberta</div>
+            </div>
+            <div class="map-marker" data-category="banheiro_masculino" style="top: 69%; left: 53%;">
+              <span class="marker-icon banheiro-masculino-icon"><i class="fa-solid fa-mars"></i></span>
+              <div class="marker-tooltip">Banheiro Masculino - Bloco Central</div>
+            </div>
+            <div class="map-marker" data-category="banheiro_masculino" style="top: 89%; left: 04%;">
+              <span class="marker-icon banheiro-masculino-icon"><i class="fa-solid fa-mars"></i></span>
+              <div class="marker-tooltip">Banheiro Masculino - Área Desportiva</div>
+            </div>
+
+            <!-- BANHEIROS FEMININOS -->
+            <div class="map-marker" data-category="banheiro_feminino" style="top: 52%; left: 53%;">
+              <span class="marker-icon banheiro-feminino-icon"><i class="fa-solid fa-venus"></i></span>
+              <div class="marker-tooltip">Banheiro Feminino - Bloco Didático 1</div>
+            </div>
+            <div class="map-marker" data-category="banheiro_feminino" style="top: 46%; left: 71%;">
+              <span class="marker-icon banheiro-feminino-icon"><i class="fa-solid fa-venus"></i></span>
+              <div class="marker-tooltip">Banheiro Feminino - Quadra Coberta</div>
+            </div>
+            <div class="map-marker" data-category="banheiro_feminino" style="top: 71%; left: 53%;">
+              <span class="marker-icon banheiro-feminino-icon"><i class="fa-solid fa-venus"></i></span>
+              <div class="marker-tooltip">Banheiro Feminino - Bloco Central</div>
+            </div>
+            <div class="map-marker" data-category="banheiro_feminino" style="top: 81%; left: 16%;">
+              <span class="marker-icon banheiro-feminino-icon"><i class="fa-solid fa-venus"></i></span>
+              <div class="marker-tooltip">Banheiro Feminino - Área Desportiva</div>
+            </div>
+
+            <!-- VESTIÁRIOS -->
+            <div class="map-marker" data-category="vestiario_masculino" style="top: 51%; left: 73%;">
+              <span class="marker-icon vestiario-masculino-icon"><i class="fa-solid fa-shirt"></i></span>
+              <div class="marker-tooltip">Vestiário Masculino - Anexo ao Ginásio</div>
+            </div>
+            <div class="map-marker" data-category="vestiario_feminino" style="top: 48%; left: 73%;">
+              <span class="marker-icon vestiario-feminino-icon"><i class="fa-solid fa-shirt"></i></span>
+              <div class="marker-tooltip">Vestiário Feminino - Anexo ao Ginásio</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- RODAPÉ -->
+  <footer class="app-footer">
+    <p>&copy; 2026 CEEP - Mapa Interativo do Campus. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- MODAIS PURE CSS DOS PONTOS DO MAPA -->
+
+  <!-- MODAL BIBLIOTECA -->
+  <div class="modal-overlay pure-css-modal-biblio">
+    <div class="modal-card">
+      <label for="modal-biblio-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="biblio-slide" id="biblio-slide1" checked hidden>
+        <input type="radio" name="biblio-slide" id="biblio-slide2" hidden>
+        <input type="radio" name="biblio-slide" id="biblio-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/biblio1.jpeg') }}" class="carousel-img" alt="Foto 1 Biblioteca"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/biblio2.jpeg') }}" class="carousel-img" alt="Foto 2 Biblioteca"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/biblio3.jpeg') }}" class="carousel-img" alt="Foto 3 Biblioteca"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="biblio-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="biblio-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="biblio-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="biblio-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="biblio-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="biblio-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="biblio-slide1" class="dot dot-1"></label>
+          <label for="biblio-slide2" class="dot dot-2"></label>
+          <label for="biblio-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Biblioteca do CEEP</h2>
+        <p class="modal-description">Espaço reservado para estudo, leitura, consulta de livros e projetos.</p>
+
+        <div class="services-accordion">
+          <div class="accordion-item">
+            <button type="button" class="accordion-header" data-target="panelAcervoBiblio">
+              <span><i class="fa-solid fa-book-bookmark"></i> Acervo por Componente</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelAcervoBiblio">
+              <div class="panel-content" style="gap: 12px;">
+                <div style="background-color: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-weight: 600; color: #f8fafc; font-size: 14px;">Total aproximado do acervo:</span>
+                  <span style="font-weight: 700; color: #38bdf8; font-size: 15px;">9.657 livros</span>
+                </div>
+
+                <ol style="margin-left: 20px; color: #cbd5e1; font-size: 13px; line-height: 1.9;">
+                  <li>Administração: <strong style="color: #f8fafc;">1.174</strong></li>
+                  <li>Edificações: <strong style="color: #f8fafc;">125</strong></li>
+                  <li>Comuns (Edificações / Informática): <strong style="color: #f8fafc;">48</strong></li>
+                  <li>Eletromecânica: <strong style="color: #f8fafc;">693</strong></li>
+                  <li>Eletrônica: <strong style="color: #f8fafc;">95</strong></li>
+                  <li>Comuns (Eletrônica / Eletromecânica): <strong style="color: #f8fafc;">862</strong></li>
+                  <li>Enfermagem: <strong style="color: #f8fafc;">814</strong></li>
+                  <li>Estética: <strong style="color: #f8fafc;">21</strong></li>
+                  <li>Voltados para a área da Informática: <strong style="color: #f8fafc;">617</strong></li>
+                  <li>Meio Ambiente: <strong style="color: #f8fafc;">794</strong></li>
+                  <li>Programação de Jogos Digitais: <strong style="color: #f8fafc;">5</strong></li>
+                  <li>Segurança do Trabalho: <strong style="color: #f8fafc;">491</strong></li>
+                </ol>
+
+                <p style="font-size: 12px; color: #94a3b8; font-style: italic; margin-top: 4px;">
+                  * Observação: Os demais livros estão distribuídos nas outras classificações.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL QUADRA -->
+  <div class="modal-overlay pure-css-modal-quadra">
+    <div class="modal-card">
+      <label for="modal-quadra-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="quadra-slide" id="quadra-slide1" checked hidden>
+        <input type="radio" name="quadra-slide" id="quadra-slide2" hidden>
+        <input type="radio" name="quadra-slide" id="quadra-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/quadra1.png') }}" class="carousel-img" alt="Foto 1 Quadra"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/quadra2.png') }}" class="carousel-img" alt="Foto 2 Quadra"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/quadra3.png') }}" class="carousel-img" alt="Foto 3 Quadra"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="quadra-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quadra-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="quadra-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quadra-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="quadra-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quadra-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="quadra-slide1" class="dot dot-1"></label>
+          <label for="quadra-slide2" class="dot dot-2"></label>
+          <label for="quadra-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Quadra Poliesportiva do CEEP</h2>
+        <p class="modal-description">Espaço para Educação Física, eventos esportivos e campeonatos.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LAB QUÍMICA -->
+  <div class="modal-overlay pure-css-modal-quimica">
+    <div class="modal-card">
+      <label for="modal-quimica-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="quimica-slide" id="quimica-slide1" checked hidden>
+        <input type="radio" name="quimica-slide" id="quimica-slide2" hidden>
+        <input type="radio" name="quimica-slide" id="quimica-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/quimica1.png') }}" class="carousel-img" alt="Foto 1 Química"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/quimica2.png') }}" class="carousel-img" alt="Foto 2 Química"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/quimica3.png') }}" class="carousel-img" alt="Foto 3 Química"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="quimica-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quimica-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="quimica-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quimica-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="quimica-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quimica-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="quimica-slide1" class="dot dot-1"></label>
+          <label for="quimica-slide2" class="dot dot-2"></label>
+          <label for="quimica-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Laboratório de Química do CEEP</h2>
+        <p class="modal-description">Equipado para aulas práticas e experimentos científicos.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LAB ELETRÔNICA -->
+  <div class="modal-overlay pure-css-modal-eletronica">
+    <div class="modal-card">
+      <label for="modal-eletronica-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="eletronica-slide" id="eletronica-slide1" checked hidden>
+        <input type="radio" name="eletronica-slide" id="eletronica-slide2" hidden>
+        <input type="radio" name="eletronica-slide" id="eletronica-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/eletronica1.jpeg') }}" class="carousel-img" alt="Foto 1 Eletrônica"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/eletronica2.png') }}" class="carousel-img" alt="Foto 2 Eletrônica"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/eletronica3.png') }}" class="carousel-img" alt="Foto 3 Eletrônica"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="eletronica-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="eletronica-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="eletronica-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="eletronica-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="eletronica-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="eletronica-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="eletronica-slide1" class="dot dot-1"></label>
+          <label for="eletronica-slide2" class="dot dot-2"></label>
+          <label for="eletronica-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Laboratório de Eletrônica do CEEP</h2>
+        <p class="modal-description">Espaço estruturado para aprendizado de circuitos e microcontroladores.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PEDAGOGIA -->
+  <div class="modal-overlay pure-css-modal-pedagogia">
+    <div class="modal-card">
+      <label for="modal-pedagogia-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="pedagogia-slide" id="pedagogia-slide1" checked hidden>
+        <input type="radio" name="pedagogia-slide" id="pedagogia-slide2" hidden>
+        <input type="radio" name="pedagogia-slide" id="pedagogia-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/pedagogia1.png') }}" class="carousel-img" alt="Foto 1 Pedagogia"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/pedagogia2.png') }}" class="carousel-img" alt="Foto 2 Pedagogia"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/pedagogia3.jpeg') }}" class="carousel-img" alt="Foto 3 Pedagogia"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="pedagogia-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="pedagogia-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="pedagogia-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="pedagogia-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="pedagogia-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="pedagogia-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="pedagogia-slide1" class="dot dot-1"></label>
+          <label for="pedagogia-slide2" class="dot dot-2"></label>
+          <label for="pedagogia-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Setor Pedagógico do CEEP</h2>
+        <p class="modal-description">Acompanhamento acadêmico e orientação educacional aos estudantes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL HORTA -->
+  <div class="modal-overlay pure-css-modal-horta">
+    <div class="modal-card">
+      <label for="modal-horta-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="horta-slide" id="horta-slide1" checked hidden>
+        <input type="radio" name="horta-slide" id="horta-slide2" hidden>
+        <input type="radio" name="horta-slide" id="horta-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/horta1.png') }}" class="carousel-img" alt="Foto 1 Horta"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/horta2.png') }}" class="carousel-img" alt="Foto 2 Horta"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/horta3.png') }}" class="carousel-img" alt="Foto 3 Horta"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="horta-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="horta-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="horta-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="horta-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="horta-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="horta-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="horta-slide1" class="dot dot-1"></label>
+          <label for="horta-slide2" class="dot dot-2"></label>
+          <label for="horta-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Horta Escolar do CEEP</h2>
+        <p class="modal-description">Espaço para práticas agroecológicas e sustentabilidade.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL REPROGRAFIA -->
+  <div class="modal-overlay pure-css-modal-reprografia">
+    <div class="modal-card">
+      <label for="modal-reprografia-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      
+      <div class="pure-carousel">
+        <input type="radio" name="reprografia-slide" id="reprografia-slide1" checked hidden>
+        <input type="radio" name="reprografia-slide" id="reprografia-slide2" hidden>
+        <input type="radio" name="reprografia-slide" id="reprografia-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/reprografia1.jpeg') }}" class="carousel-img" alt="Foto 1 Reprografia"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/reprografia2.png') }}" class="carousel-img" alt="Foto 2 Reprografia"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/reprografia3.jpeg') }}" class="carousel-img" alt="Foto 3 Reprografia"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="reprografia-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="reprografia-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="reprografia-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="reprografia-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="reprografia-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="reprografia-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="reprografia-slide1" class="dot dot-1"></label>
+          <label for="reprografia-slide2" class="dot dot-2"></label>
+          <label for="reprografia-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Reprografia do CEEP</h2>
+        <p class="modal-description">A Reprografia é o setor encarregado da impressão, cópia e encadernação de apostilas, atividades, provas e materiais didáticos para estudantes e professores da instituição.</p>
+
+        <div class="services-accordion">
+          <!-- 1. IMPRIMIR FOLHA DE REDAÇÃO -->
+          <div class="accordion-item">
+            <button type="button" class="accordion-header" data-target="panelRedacaoRepro">
+              <span><i class="fa-solid fa-file-pen"></i> Imprimir Folha de Redação</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelRedacaoRepro">
+              <div class="panel-content">
+                <p class="panel-instruction" style="font-size: 14px; color: #e2e8f0;">
+                  <i class="fa-solid fa-qrcode" style="color: #38bdf8; margin-right: 8px;"></i>
+                  Fazer PIX para chave: <strong style="color: #38bdf8;">XXX.XXX.XXX-YY</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. IMPRIMIR DOCUMENTO PRÓPRIO -->
+          <div class="accordion-item">
+            <button type="button" class="accordion-header" data-target="panelDocProprioRepro">
+              <span><i class="fa-solid fa-file-arrow-up"></i> Imprimir Documento Próprio</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelDocProprioRepro">
+              <div class="panel-content" style="gap: 16px;">
+                <div class="file-upload-box">
+                  <label for="reproDocInput" class="file-label">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span id="reproDocLabelText">Escolher arquivo (PDF ou docx)</span>
+                  </label>
+                  <input type="file" id="reproDocInput" class="file-input" accept=".pdf,.doc,.docx">
+                </div>
+
+                <p class="panel-instruction" style="font-size: 14px; color: #e2e8f0;">
+                  <i class="fa-solid fa-qrcode" style="color: #38bdf8; margin-right: 8px;"></i>
+                  Fazer PIX para chave: <strong style="color: #38bdf8;">XXX.XXX.XXX-YY</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AUDITÓRIO -->
+  <div class="modal-overlay pure-css-modal-auditorio">
+    <div class="modal-card">
+      <label for="modal-auditorio-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="auditorio-slide" id="auditorio-slide1" checked hidden>
+        <input type="radio" name="auditorio-slide" id="auditorio-slide2" hidden>
+        <input type="radio" name="auditorio-slide" id="auditorio-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/auditorio1.png') }}" class="carousel-img" alt="Foto 1 Auditório"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/auditorio2.png') }}" class="carousel-img" alt="Foto 2 Auditório"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/auditorio3.png') }}" class="carousel-img" alt="Foto 3 Auditório"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="auditorio-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="auditorio-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="auditorio-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="auditorio-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="auditorio-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="auditorio-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="auditorio-slide1" class="dot dot-1"></label>
+          <label for="auditorio-slide2" class="dot dot-2"></label>
+          <label for="auditorio-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Auditório do CEEP</h2>
+        <p class="modal-description">O Auditório do CEEP é o espaço destinado à realização de palestras, seminários, apresentações culturais, formaturas e reuniões acadêmicas.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL QUADRA EXTERNA -->
+  <div class="modal-overlay pure-css-modal-quadra_externa">
+    <div class="modal-card">
+      <label for="modal-quadra_externa-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="quadra_externa-slide" id="quadra_externa-slide1" checked hidden>
+        <input type="radio" name="quadra_externa-slide" id="quadra_externa-slide2" hidden>
+        <input type="radio" name="quadra_externa-slide" id="quadra_externa-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/quadra_externa1.png') }}" class="carousel-img" alt="Foto 1 Quadra Externa"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/quadra_externa2.png') }}" class="carousel-img" alt="Foto 2 Quadra Externa"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/quadra_externa3.png') }}" class="carousel-img" alt="Foto 3 Quadra Externa"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="quadra_externa-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quadra_externa-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="quadra_externa-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quadra_externa-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="quadra_externa-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="quadra_externa-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="quadra_externa-slide1" class="dot dot-1"></label>
+          <label for="quadra_externa-slide2" class="dot dot-2"></label>
+          <label for="quadra_externa-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Quadra Externa do CEEP</h2>
+        <p class="modal-description">A Quadra Externa é um espaço descoberto destinado à prática de atividades físicas ao ar livre, treinos e recreação dos estudantes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CAMPO SINTÉTICO -->
+  <div class="modal-overlay pure-css-modal-campo_sintetico">
+    <div class="modal-card">
+      <label for="modal-campo_sintetico-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      
+      <div class="pure-carousel">
+        <div class="carousel-slides">
+          <div class="carousel-slide single-slide">
+            <img src="{{ url_for('static', filename='img/campo_sintetico1.png') }}" class="carousel-img" alt="Foto do Campo Sintético">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Campo de Futebol Sintético do CEEP</h2>
+        <p class="modal-description">
+          O Campo de Futebol Sintético é um espaço desportivo equipado com relvado sintético, destinado à realização de partidas de futebol, treinos e torneios escolares.
+        </p>
+
+        <div class="services-accordion">
+          <div class="accordion-item">
+            <button type="button" class="accordion-header" data-target="panelAluguelCampo">
+              <span><i class="fa-solid fa-calendar-check"></i> Aluguel de Gramado Society</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelAluguelCampo">
+              <div class="panel-content">
+                <p class="panel-instruction" style="font-size: 14px; color: #e2e8f0;">
+                  <i class="fa-solid fa-phone" style="color: #22c55e; margin-right: 8px;"></i>
+                  Entrar em Contato com: <strong style="color: #38bdf8;">45 9959-6822 (Madruga)</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ENTRADA CEEP -->
+  <div class="modal-overlay pure-css-modal-entrada_ceep">
+    <div class="modal-card">
+      <label for="modal-entrada_ceep-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <div class="carousel-slides">
+          <div class="carousel-slide single-slide"><img src="{{ url_for('static', filename='img/entrada_ceep1.png') }}" class="carousel-img" alt="Foto da Entrada do CEEP"></div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <h2 class="modal-title">Entrada / Acesso Principal do CEEP</h2>
+        <p class="modal-description">Ponto principal de acesso de alunos, professores, funcionários e visitantes ao campus do CEEP.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CANTINA -->
+  <div class="modal-overlay pure-css-modal-cantina">
+    <div class="modal-card">
+      <label for="modal-cantina-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="pure-carousel">
+        <input type="radio" name="cantina-slide" id="cantina-slide1" checked hidden>
+        <input type="radio" name="cantina-slide" id="cantina-slide2" hidden>
+        <input type="radio" name="cantina-slide" id="cantina-slide3" hidden>
+
+        <div class="carousel-slides">
+          <div class="carousel-slide slide-1"><img src="{{ url_for('static', filename='img/cantina1.jpeg') }}" class="carousel-img" alt="Foto 1 Cantina"></div>
+          <div class="carousel-slide slide-2"><img src="{{ url_for('static', filename='img/cantina2.jpeg') }}" class="carousel-img" alt="Foto 2 Cantina"></div>
+          <div class="carousel-slide slide-3"><img src="{{ url_for('static', filename='img/cantina3.jpeg') }}" class="carousel-img" alt="Foto 3 Cantina"></div>
+        </div>
+
+        <div class="carousel-controls control-1">
+          <label for="cantina-slide3" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="cantina-slide2" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-2">
+          <label for="cantina-slide1" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="cantina-slide3" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+        <div class="carousel-controls control-3">
+          <label for="cantina-slide2" class="carousel-btn prev"><i class="fa-solid fa-chevron-left"></i></label>
+          <label for="cantina-slide1" class="carousel-btn next"><i class="fa-solid fa-chevron-right"></i></label>
+        </div>
+
+        <div class="carousel-dots">
+          <label for="cantina-slide1" class="dot dot-1"></label>
+          <label for="cantina-slide2" class="dot dot-2"></label>
+          <label for="cantina-slide3" class="dot dot-3"></label>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <h2 class="modal-title">Cantina do CEEP</h2>
+        <p class="modal-description">A Cantina do CEEP é o espaço destinado à alimentação e convivência de alunos, professores e funcionários.</p>
+
+        <div class="services-accordion">
+          <div class="accordion-item">
+            <button type="button" class="accordion-header" data-target="panelComprarSalgadoCantina">
+              <span><i class="fa-solid fa-utensils"></i> Comprar Salgado</span>
+              <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+            </button>
+            <div class="accordion-panel" id="panelComprarSalgadoCantina">
+              <div class="panel-content" style="gap: 12px;">
+                <p class="panel-instruction" style="font-size: 14px; color: #e2e8f0;">
+                  <i class="fa-solid fa-qrcode" style="color: #38bdf8; margin-right: 8px;"></i>
+                  Fazer PIX para chave: <strong style="color: #38bdf8;">XXX.XXX.XXX-YY</strong>
+                </p>
+
+                <div style="background-color: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 8px; padding: 10px 14px; color: #fde047; font-size: 12px; display: flex; align-items: flex-start; gap: 8px;">
+                  <i class="fa-solid fa-circle-exclamation" style="margin-top: 2px;"></i>
+                  <span><strong>Obs:</strong> Apresente o comprovante na retirada. Comprovantes emitidos no dia anterior não serão aceitos.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CASA DO MADRUGA -->
+  <div class="modal-overlay pure-css-modal-casa_madruga">
+    <div class="modal-card" style="max-width: 500px;">
+      <label for="modal-casa_madruga-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="modal-body" style="padding: 32px 24px;">
+        <h2 class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-house-user" style="color: #b45309;"></i> Casa do Madruga
+        </h2>
+        <p class="modal-description" style="margin-top: 12px; margin-bottom: 0;">
+          Residência do caseiro e responsável pela zeladoria, manutenção e suporte geral do campus.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL QUIOSQUE -->
+  <div class="modal-overlay pure-css-modal-cantinho_sossego">
+    <div class="modal-card" style="max-width: 500px;">
+      <label for="modal-cantinho_sossego-toggle" class="close-modal-btn" title="Fechar"><i class="fa-solid fa-xmark"></i></label>
+      <div class="modal-body" style="padding: 32px 24px;">
+        <h2 class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-leaf" style="color: #10b981;"></i> Quiosque (Cantinho do Sossego)
+        </h2>
+        <p class="modal-description" style="margin-top: 12px; margin-bottom: 0;">
+          Área de descanso e convivência tranquila do colégio. Espaço arborizado e calmo, ideal para leitura e momentos de relaxamento.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS DA PÁGINA -->
+  <script>
+    let currentCGM = "{{ cgm }}";
+    let currentNome = "{{ username }}";
+
+    // Menu Lateral
+    const menuToggle = document.getElementById('menuToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function openMenu() { sidebar.classList.remove('collapsed'); sidebarOverlay.classList.add('active'); }
+    function closeMenu() { sidebar.classList.add('collapsed'); sidebarOverlay.classList.remove('active'); }
+
+    if (menuToggle) menuToggle.addEventListener('click', () => sidebar.classList.contains('collapsed') ? openMenu() : closeMenu());
+    if (closeSidebar) closeSidebar.addEventListener('click', closeMenu);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMenu);
+
+    // Filtros no Mapa
+    const checkboxes = document.querySelectorAll('.category-checkbox');
+    const markers = document.querySelectorAll('.map-marker');
+
+    function updateMarkersVisibility() {
+      const activeCategories = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+      markers.forEach(marker => {
+        const category = marker.getAttribute('data-category');
+        marker.style.display = activeCategories.includes(category) ? 'block' : 'none';
+      });
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updateMarkersVisibility));
+
+    const btnShowAll = document.getElementById('btnShowAll');
+    const btnHideAll = document.getElementById('btnHideAll');
+
+    if (btnShowAll) {
+      btnShowAll.addEventListener('click', () => {
+        checkboxes.forEach(cb => cb.checked = true);
+        updateMarkersVisibility();
+      });
+    }
+
+    if (btnHideAll) {
+      btnHideAll.addEventListener('click', () => {
+        checkboxes.forEach(cb => cb.checked = false);
+        updateMarkersVisibility();
+      });
+    }
+
+    // Pesquisa
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        markers.forEach(marker => {
+          const tooltipText = marker.querySelector('.marker-tooltip').textContent.toLowerCase();
+          marker.style.display = tooltipText.includes(query) ? 'block' : 'none';
+        });
+      });
+    }
+
+    // Modal da Secretaria
+    const secretariaMarker = document.getElementById('secretariaMarker');
+    const secretariaModal = document.getElementById('secretariaModal');
+    const closeSecretariaModal = document.getElementById('closeSecretariaModal');
+
+    function openSecretariaModal() { secretariaModal.classList.add('active'); }
+    function closeSecretariaModalFunc() { secretariaModal.classList.remove('active'); }
+
+    if (secretariaMarker) secretariaMarker.addEventListener('click', openSecretariaModal);
+    if (closeSecretariaModal) closeSecretariaModal.addEventListener('click', closeSecretariaModalFunc);
+    if (secretariaModal) secretariaModal.addEventListener('click', (e) => { if (e.target === secretariaModal) closeSecretariaModalFunc(); });
+
+    // Controle Universal de Accordions
+    document.addEventListener('click', function(e) {
+      const header = e.target.closest('.accordion-header');
+      if (!header) return;
+
+      const targetId = header.getAttribute('data-target');
+      const targetPanel = document.getElementById(targetId);
+
+      if (targetPanel) {
+        const isOpen = targetPanel.classList.contains('open');
+
+        document.querySelectorAll('.accordion-panel').forEach(panel => panel.classList.remove('open'));
+        document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
+
+        if (!isOpen) {
+          targetPanel.classList.add('open');
+          header.classList.add('active');
+        }
+      }
+    });
+
+    // Upload Reprografia
+    document.addEventListener('change', function(e) {
+      if (e.target && e.target.id === 'reproDocInput') {
+        const labelText = document.getElementById('reproDocLabelText');
+        if (labelText) {
+          labelText.textContent = e.target.files.length > 0 
+            ? e.target.files[0].name 
+            : 'Escolher arquivo (PDF ou docx)';
+        }
+      }
+    });
+
+    // Upload PDF Atestado
+    const atestadoFile = document.getElementById('atestadoFile');
+    const fileNameText = document.getElementById('fileNameText');
+    if (atestadoFile) {
+      atestadoFile.addEventListener('change', (e) => {
+        fileNameText.textContent = e.target.files.length > 0 ? e.target.files[0].name : 'Clique para selecionar o arquivo PDF';
+      });
+    }
+
+    // APIs da Secretaria
+    const btnEnviarAtestado = document.getElementById('btnEnviarAtestado');
+    const msgAtestado = document.getElementById('msgAtestado');
+    const msgAtestadoTexto = document.getElementById('msgAtestadoTexto');
+    if (btnEnviarAtestado) {
+      btnEnviarAtestado.addEventListener('click', () => {
+        if (!atestadoFile.files.length) { alert('Por favor, selecione um arquivo PDF.'); return; }
+        const formData = new FormData();
+        formData.append('file', atestadoFile.files[0]);
+        formData.append('cgm', currentCGM);
+
+        fetch('/api/protocolar-atestado', { method: 'POST', body: formData })
+          .then(res => res.json())
+          .then(data => {
+            if (data.sucesso) { msgAtestadoTexto.textContent = data.mensagem; msgAtestado.classList.remove('hidden'); }
+            else alert(data.mensagem);
+          });
+      });
+    }
+
+    const btnBuscarContrato = document.getElementById('btnBuscarContrato');
+    const contractResult = document.getElementById('contractResult');
+    const msgContratoErro = document.getElementById('msgContratoErro');
+    const nomeContratoInput = document.getElementById('nomeContratoInput');
+    if (btnBuscarContrato) {
+      btnBuscarContrato.addEventListener('click', () => {
+        const nome = nomeContratoInput.value.trim();
+        if (!nome) { alert('Digite seu nome completo.'); return; }
+
+        fetch('/api/consultar-contrato', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome: nome })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso) {
+            document.getElementById('resEmpresa').textContent = data.empresa;
+            document.getElementById('resFuncao').textContent = data.funcao;
+            document.getElementById('resCarga').textContent = data.carga_horaria;
+            document.getElementById('resTempo').textContent = data.tempo_restante;
+            contractResult.classList.remove('hidden');
+            msgContratoErro.classList.add('hidden');
+          } else {
+            contractResult.classList.add('hidden');
+            msgContratoErro.textContent = data.mensagem;
+            msgContratoErro.classList.remove('hidden');
+          }
+        });
+      });
+    }
+
+    const btnSolicitarDeclaracao = document.getElementById('btnSolicitarDeclaracao');
+    const msgDeclaracao = document.getElementById('msgDeclaracao');
+    const nomeDeclaracaoInput = document.getElementById('nomeDeclaracaoInput');
+    const cgmInput = document.getElementById('cgmInput');
+    if (btnSolicitarDeclaracao) {
+      btnSolicitarDeclaracao.addEventListener('click', () => {
+        const nome = nomeDeclaracaoInput.value.trim();
+        const cgm = cgmInput.value.trim();
+        if (!nome || !cgm) { alert('Preencha Nome e CGM.'); return; }
+
+        fetch('/api/solicitar-declaracao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome: nome, cgm: cgm })
+        })
+        .then(res => res.json())
+        .then(data => { if (data.sucesso) msgDeclaracao.classList.remove('hidden'); else alert(data.mensagem); });
+      });
+    }
+
+    // Modal de Mensagens
+    const btnAbrirMensagens = document.getElementById('btnAbrirMensagens');
+    const mensagensModal = document.getElementById('mensagensModal');
+    const closeMensagensModal = document.getElementById('closeMensagensModal');
+    const listaMensagensContainer = document.getElementById('listaMensagensContainer');
+
+    function carregarMensagens() {
+      listaMensagensContainer.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">Carregando...</p>';
+      fetch(`/api/mensagens/${currentCGM}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso && data.mensagens.length > 0) {
+            listaMensagensContainer.innerHTML = '';
+            data.mensagens.forEach(msg => {
+              const msgCard = document.createElement('div');
+              msgCard.className = 'message-card';
+              msgCard.innerHTML = `
+                <div class="message-header"><strong>${msg.titulo}</strong><span class="message-date">${msg.data}</span></div>
+                <div class="message-content">${msg.conteudo}</div>
+                ${msg.anexo_path ? `<a href="/download-doc/${msg.anexo_path}" class="message-attachment" target="_blank"><i class="fa-solid fa-paperclip"></i> Anexo: ${msg.anexo_nome}</a>` : ''}
+              `;
+              listaMensagensContainer.appendChild(msgCard);
+            });
+          } else {
+            listaMensagensContainer.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">Nenhuma mensagem.</p>';
+          }
+        });
+    }
+
+    if (btnAbrirMensagens) {
+      btnAbrirMensagens.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); carregarMensagens(); mensagensModal.classList.add('active'); });
+    }
+    if (closeMensagensModal) closeMensagensModal.addEventListener('click', () => mensagensModal.classList.remove('active'));
+    if (mensagensModal) mensagensModal.addEventListener('click', (e) => { if (e.target === mensagensModal) mensagensModal.classList.remove('active'); });
+  </script>
+
+</body>
+</html>

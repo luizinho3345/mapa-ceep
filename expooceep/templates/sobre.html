@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre Nós - CEEP Mapa</title>
+  
+  <!-- Fontes Google & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="sobre-body">
+
+  <div class="page-wrapper">
+    
+    <!-- CABEÇALHO DA PÁGINA -->
+    <header class="top-header sobre-header">
+      <div class="header-left">
+        <a href="/" class="btn-back">
+          <i class="fa-solid fa-arrow-left"></i> Voltar ao Mapa
+        </a>
+      </div>
+      <h1 class="logo-title header-center-title">
+        <span><strong class="text-blue">Sobre</strong> Nós</span>
+      </h1>
+      <div class="header-spacer"></div>
+    </header>
+
+    <main class="sobre-main-content">
+
+      <!-- SECÇÃO 1: SOBRE O PROJETO -->
+      <section class="sobre-card-glass">
+        <h2 class="section-title text-center">
+          <span class="text-blue">Sobre o Projeto:</span> Origem, Objetivo e Resultados
+        </h2>
+
+        <div class="sobre-projeto-grid">
+          <!-- Moldura da Foto do Projeto -->
+          <div class="photo-frame-container project-frame">
+            <div class="frame-inner-border"></div>
+            <img src="{{ url_for('static', filename='img/sobre_projeto.jpeg') }}" alt="Foto do Projeto" class="frame-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="frame-placeholder"><i class="fa-solid fa-image"></i> FOTO</div>
+          </div>
+
+          <!-- Texto do Projeto (Editável no VS Code) -->
+          <div class="sobre-projeto-text">
+            <p class="paragraph-highlight">
+              Nosso projeto surgiu no ano anterior, quando nosso objetivo era, de maneira não muito ambiciosa naquele momento, retratar o ambiente em que nós (alunos) passávamos todas nossas manhãs, de segunda à sexta.
+            </p>
+            <p>
+              Os alunos <strong>Luiz</strong> e <strong>João Vítor</strong> foram os idealizadores primordiais, que logo convidaram <strong>Samara</strong> para dar seu ponto de vista sobre o projeto. Logo, o grupo resolveu apresentar o projeto na <strong>ExpoCEEP</strong> daquele ano (2025), e mesmo valorizando mais os aspectos artísticos aos técnicos, o projeto despertou a curiosidade de diversos avaliadores e membros da comunidade escolar, e assim os DEV's foram premiados com a primeira colocação entre os projetos de Desenvolvimento de Sistemas daquela edição.
+            </p>
+            <p>
+              Agora, com mais alcance técnico e mais repertório, o grupo busca repetir o feito, e proporcionar muita diversão a todos os visitantes...
+            </p>
+            <!-- Digite aqui no VS Code os restantes parágrafos do texto do projeto -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SECÇÃO 2: SOBRE OS INTEGRANTES -->
+      <section class="sobre-card-glass">
+        <h2 class="section-title text-center">
+          <span class="text-blue">Sobre Os Integrantes:</span> Quem São e Funções
+        </h2>
+
+        <div class="integrantes-grid">
+          
+          <!-- INTEGRANTE 1: JOÃO -->
+          <div class="integrante-card">
+            <div class="photo-frame-container member-frame">
+              <div class="frame-inner-border"></div>
+              <img src="{{ url_for('static', filename='img/joao.jpg') }}" alt="João V Olizaroski" class="frame-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="frame-placeholder"><i class="fa-solid fa-user"></i> FOTO</div>
+            </div>
+            <div class="integrante-info">
+              <h3><span class="text-blue">Joao V</span><br>Olizaroski</h3>
+              <div class="roles-container">
+                <span class="role-badge leader"><i class="fa-solid fa-crown"></i> Scrum Master</span>
+                <span class="role-badge">Back-end</span>
+                <span class="role-badge">Banco de Dados</span>
+              </div>
+              <span class="age-badge"><i class="fa-solid fa-cake-candles"></i> 17 anos</span>
+            </div>
+          </div>
+
+          <!-- INTEGRANTE 2: LUIZ -->
+          <div class="integrante-card">
+            <div class="photo-frame-container member-frame">
+              <div class="frame-inner-border"></div>
+              <img src="{{ url_for('static', filename='img/luiz.jpg') }}" alt="Luiz Gustavo Seidel" class="frame-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="frame-placeholder"><i class="fa-solid fa-user"></i> FOTO</div>
+            </div>
+            <div class="integrante-info">
+              <h3><span class="text-blue">Luiz</span><br>Gustavo Seidel</h3>
+              <div class="roles-container">
+                <span class="role-badge design"><i class="fa-solid fa-palette"></i> Designer</span>
+                <span class="role-badge">Front-end</span>
+              </div>
+              <span class="age-badge"><i class="fa-solid fa-cake-candles"></i> 17 anos</span>
+            </div>
+          </div>
+
+          <!-- INTEGRANTE 3: ROBERT -->
+          <div class="integrante-card">
+            <div class="photo-frame-container member-frame">
+              <div class="frame-inner-border"></div>
+              <img src="{{ url_for('static', filename='img/robert.jpg') }}" alt="Robert J. V. Castro" class="frame-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="frame-placeholder"><i class="fa-solid fa-user"></i> FOTO</div>
+            </div>
+            <div class="integrante-info">
+              <h3><span class="text-blue">Robert J.</span><br>V. Castro</h3>
+              <div class="roles-container">
+                <span class="role-badge">Interface</span>
+                <span class="role-badge">Levantamento de Requisitos</span>
+              </div>
+              <span class="age-badge"><i class="fa-solid fa-cake-candles"></i> 17 anos</span>
+            </div>
+          </div>
+
+          <!-- INTEGRANTE 4: SAMARA -->
+          <div class="integrante-card">
+            <div class="photo-frame-container member-frame">
+              <div class="frame-inner-border"></div>
+              <img src="{{ url_for('static', filename='img/samara.png') }}" alt="Samara Geronutti" class="frame-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="frame-placeholder"><i class="fa-solid fa-user"></i> FOTO</div>
+            </div>
+            <div class="integrante-info">
+              <h3><span class="text-blue">Samara</span><br>Geronutti</h3>
+              <div class="roles-container">
+                <span class="role-badge doc"><i class="fa-solid fa-file-lines"></i> Documentação</span>
+                <span class="role-badge">Testes de Usabilidade</span>
+              </div>
+              <span class="age-badge"><i class="fa-solid fa-cake-candles"></i> 17 anos</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 CEEP - Mapa Interativo do Campus. Todos os direitos reservados.</p>
+  </footer>
+
+</body>
+</html>
